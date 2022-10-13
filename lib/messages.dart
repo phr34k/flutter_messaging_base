@@ -2,7 +2,7 @@ import 'package:flutter_messaging_base/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart';
 import 'package:json_annotation/json_annotation.dart';
-part 'messages.g.dart';
+//part 'messages.g.dart';
 
 extension MessageList on List<Message> {
   Message? lastWhereNull(bool Function(Message element) test) {
@@ -10,6 +10,8 @@ extension MessageList on List<Message> {
     return itt.isNotEmpty ? itt.last : null;
   }
 }
+
+/*
 
 /// A class that represents text message.
 @immutable
@@ -138,3 +140,4 @@ class SystemTextMessage extends CustomMessage {
   /// User's message
   final String text;
 }
+*/

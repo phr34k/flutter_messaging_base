@@ -26,7 +26,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
-import 'package:flutter_chat_ui/src/widgets/inherited_l10n.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
@@ -40,10 +40,9 @@ import 'package:flutter_chat_ui/src/models/preview_image.dart';
 import 'package:flutter_chat_ui/src/models/send_button_visibility_mode.dart';
 import 'package:flutter_chat_ui/src/util.dart';
 import 'package:flutter_chat_ui/src/widgets/chat_list.dart';
-import 'package:flutter_chat_ui/src/widgets/inherited_chat_theme.dart';
-import 'package:flutter_chat_ui/src/widgets/inherited_user.dart';
-import 'package:flutter_chat_ui/src/widgets/input.dart';
-import 'package:flutter_chat_ui/src/widgets/message.dart';
+import 'package:flutter_chat_ui/src/widgets/state/inherited_chat_theme.dart';
+import 'package:flutter_chat_ui/src/widgets/state/inherited_l10n.dart';
+import 'package:flutter_chat_ui/src/widgets/state/inherited_user.dart';
 
 /// Entry widget, represents the complete chat. If you wrap it in [SafeArea] and
 /// it should be full screen, set [SafeArea]'s `bottom` to `false`.
@@ -265,6 +264,7 @@ class Chat extends StatefulWidget {
 
 /// [Chat] widget state
 class _ChatState extends State<Chat> {
+  late ScrollController _scrollController;
   List<Object> _chatMessages = [];
   List<PreviewImage> _gallery = [];
   int _imageViewIndex = 0;
@@ -272,9 +272,16 @@ class _ChatState extends State<Chat> {
 
   @override
   void initState() {
+    _scrollController = ScrollController();
     super.initState();
 
     didUpdateWidget(widget);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -387,6 +394,7 @@ class _ChatState extends State<Chat> {
 
       return Message(
         key: ValueKey(message.id),
+        textMessageOptions: TextMessageOptions(isTextSelectable: true),
         bubbleBuilder: widget.bubbleBuilder,
         customMessageBuilder: widget.customMessageBuilder,
         emojiEnlargementBehavior: widget.emojiEnlargementBehavior,
@@ -476,6 +484,7 @@ class _ChatState extends State<Chat> {
                                 builder: (BuildContext context,
                                         BoxConstraints constraints) =>
                                     ChatList(
+                                  scrollController: _scrollController,
                                   isLastPage: widget.isLastPage,
                                   itemBuilder: (item, index) =>
                                       _messageBuilder(item, constraints),
@@ -493,10 +502,12 @@ class _ChatState extends State<Chat> {
                           isAttachmentUploading: widget.isAttachmentUploading,
                           onAttachmentPressed: widget.onAttachmentPressed,
                           onSendPressed: widget.onSendPressed,
-                          onTextChanged: widget.onTextChanged,
-                          onTextFieldTap: widget.onTextFieldTap,
-                          sendButtonVisibilityMode:
-                              widget.sendButtonVisibilityMode,
+                          options: InputOptions(
+                            onTextChanged: widget.onTextChanged,
+                            onTextFieldTap: widget.onTextFieldTap,
+                            sendButtonVisibilityMode:
+                                widget.sendButtonVisibilityMode,
+                          ),
                         ),
                   ],
                 ),
